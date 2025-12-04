@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Medication History{% endblock %}
+
+{% block content %}
+<style>
+    .history-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .history-header {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .history-header h2 {
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .dose-timeline {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .timeline-item {
+        padding: 15px;
+        border-left: 4px solid #667eea;
+        margin-bottom: 15px;
+        background: #f8f9fa;
+        border-radius: 5px;
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-date {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .timeline-med {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .timeline-dosage {
+        color: #999;
+        font-size: 13px;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .pagination a, .pagination span {
+        padding: 8px 12px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #667eea;
+    }
+
+    .pagination a:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .pagination .active {
+        background: #667eea;
+        color: white;
+    }
+</style>
+
+<div class="history-container">
+    <div class="history-header">
+        <h2>📊 Medication History</h2>
+        <p>Track all doses you've logged over time</p>
+    </div>
+
+    <div class="dose-timeline">
+        {% if doses.items %}
+            {% for dose in doses.items %}
+                <div class="timeline-item">
+                    <div class="timeline-date">{{ dose.taken_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    <div class="timeline-med">{{ dose.medication.name }}</div>
+                    <div class="timeline-dosage">{{ dose.medication.dosage }}</div>
+                    {% if dose.notes %}
+                        <div style="color: #666; font-size: 13px; margin-top: 5px;"><strong>Notes:</strong> {{ dose.notes }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if doses.pages > 1 %}
+                <div class="pagination">
+                    {% if doses.has_prev %}
+                        <a href="{{ url_for('medication_history', page=doses.prev_num) }}">← Previous</a>
+                    {% endif %}
+
+                    {% for page_num in doses.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == doses.page %}
+                                <span class="active">{{ page_num }}</span>
+                            {% else %}
+                                <a href="{{ url_for('medication_history', page=page_num) }}">{{ page_num }}</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if doses.has_next %}
+                        <a href="{{ url_for('medication_history', page=doses.next_num) }}">Next →</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-data">
+                <p>No doses logged yet. Start logging your medication doses!</p>
+                <a href="{{ url_for('index') }}" style="padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">Go to Dashboard</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

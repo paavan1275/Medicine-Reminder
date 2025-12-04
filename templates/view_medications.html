@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}View Medications{% endblock %}
+
+{% block content %}
+<style>
+    .med-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .med-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #667eea;
+    }
+
+    .med-card h3 {
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .med-card .dosage {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .med-card .description {
+        color: #999;
+        font-size: 13px;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+
+    .med-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .med-actions a, .med-actions form {
+        margin: 0;
+    }
+
+    .med-actions button {
+        width: 100%;
+    }
+
+    .delete-form {
+        margin: 0;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    .no-data p {
+        margin-bottom: 20px;
+    }
+</style>
+
+<h2 style="color: #667eea; margin-bottom: 20px;">Your Medications</h2>
+
+{% if medications %}
+    <div class="med-grid">
+        {% for med in medications %}
+            <div class="med-card">
+                <h3>{{ med.name }}</h3>
+                <div class="dosage"><strong>Dosage:</strong> {{ med.dosage }}</div>
+                {% if med.description %}
+                    <div class="description">{{ med.description }}</div>
+                {% endif %}
+                <p style="color: #999; font-size: 12px; margin-bottom: 15px;">
+                    Added: {{ med.created_at.strftime('%b %d, %Y') }}
+                </p>
+                <p style="color: #667eea; font-weight: 600; margin-bottom: 15px;">
+                    {{ med.reminders | length }} reminder(s)
+                </p>
+                <div class="med-actions">
+                    <a href="{{ url_for('view_medication', med_id=med.id) }}" style="padding: 10px 15px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; text-align: center;">View Details</a>
+                    <form method="POST" action="{{ url_for('delete_medication', med_id=med.id) }}" class="delete-form" onsubmit="return confirm('Delete this medication?');">
+                        <button type="submit" class="btn-danger" style="width: 100%;">Delete</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-data">
+        <p>No medications added yet.</p>
+        <a href="{{ url_for('add_medication') }}" style="padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">Add Your First Medication</a>
+    </div>
+{% endif %}
+{% endblock %}

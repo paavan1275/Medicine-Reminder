@@ -1,0 +1,394 @@
+{
+% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        text-align: center;
+        border-left: 6px solid #667eea;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .profile-header h2 {
+        color: #667eea;
+        margin-bottom: 10px;
+    }
+
+    .profile-info {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+
+    .profile-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .profile-tab {
+        padding: 15px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #666;
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .profile-tab.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+    }
+
+    .profile-tab:hover {
+        color: #667eea;
+    }
+
+    .tab-content {
+        display: none;
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .read-only {
+        background: #f8f9fa;
+        color: #666;
+    }
+
+    .read-only:focus {
+        background: #f8f9fa;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        flex: 1;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #28a745;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #dc3545;
+    }
+
+    .info-box {
+        background: #e7f3ff;
+        color: #0c5460;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+    }
+
+    @media (max-width: 600px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">👤</div>
+        <h2>{{ current_user.username }}</h2>
+        <div class="profile-info">
+            <p>{{ current_user.email }}</p>
+            <p style="font-size: 12px; color: #999; margin-top: 5px;">Member since {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
+        </div>
+        <div class="profile-stats">
+            <div class="stat-box">
+                <div class="stat-number">{{ medications_count }}</div>
+                <div class="stat-label">Medications</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ reminders_count }}</div>
+                <div class="stat-label">Reminders</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ doses_today }}</div>
+                <div class="stat-label">Doses Today</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ total_doses }}</div>
+                <div class="stat-label">Total Doses</div>
+            </div>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="success-message">✓ {{ message }}</div>
+                {% elif category == 'error' %}
+                    <div class="error-message">⚠ {{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="profile-tabs">
+        <button class="profile-tab active" onclick="switchTab('account')">Account Settings</button>
+        <button class="profile-tab" onclick="switchTab('password')">Change Password</button>
+        <button class="profile-tab" onclick="switchTab('security')">Security & Privacy</button>
+    </div>
+
+    <!-- Account Settings Tab -->
+    <div id="account" class="tab-content active">
+        <h3 style="color: #667eea; margin-bottom: 20px;">Account Information</h3>
+        
+        <form method="POST" action="{{ url_for('update_profile') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="{{ current_user.username }}" class="read-only" disabled>
+                <small style="color: #999; margin-top: 5px; display: block;">Username cannot be changed</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Account Status</label>
+                <div style="padding: 12px; background: #e7f3ff; border-radius: 8px; color: #0c5460;">
+                    ✓ Active - Your account is in good standing
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='{{ url_for('index') }}'">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Change Password Tab -->
+    <div id="password" class="tab-content">
+        <h3 style="color: #667eea; margin-bottom: 20px;">Change Password</h3>
+        
+        <div class="info-box">
+            💡 Keep your password strong and unique to protect your account
+        </div>
+
+        <form method="POST" action="{{ url_for('change_password') }}">
+            <div class="form-group">
+                <label for="current_password">Current Password</label>
+                <input type="password" id="current_password" name="current_password" placeholder="Enter your current password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <input type="password" id="new_password" name="new_password" placeholder="Enter new password (min 6 chars)" minlength="6" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm New Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" minlength="6" required>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Update Password</button>
+                <button type="button" class="btn btn-secondary" onclick="location.href='{{ url_for('index') }}'">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Security & Privacy Tab -->
+    <div id="security" class="tab-content">
+        <h3 style="color: #667eea; margin-bottom: 20px;">Security & Privacy</h3>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="color: #333; margin-bottom: 15px;">Login Activity</h4>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <p><strong>Last Login:</strong> Just now</p>
+                <p style="color: #999; font-size: 13px; margin-top: 10px;">Currently logged in from this browser</p>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="color: #333; margin-bottom: 15px;">Data & Privacy</h4>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <p>✓ Your medication data is encrypted and secure</p>
+                <p>✓ Only you can access your medications and reminders</p>
+                <p>✓ We never share your data with third parties</p>
+            </div>
+        </div>
+
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <h4 style="color: #856404; margin-bottom: 10px;">⚠ Danger Zone</h4>
+            <p style="color: #856404; font-size: 13px; margin-bottom: 15px;">These actions are irreversible. Please proceed with caution.</p>
+            <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you absolutely sure? This will permanently delete your account and all associated data.');">
+                <button type="submit" class="btn btn-danger" style="width: 100%;">Delete Account Permanently</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Hide all tabs
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => tab.classList.remove('active'));
+
+        // Deactivate all buttons
+        const buttons = document.querySelectorAll('.profile-tab');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+
+        // Activate corresponding button
+        event.target.classList.add('active');
+    }
+</script>
+{% endblock %}

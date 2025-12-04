@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Medication Reminder{% endblock %}
+
+{% block content %}
+<style>
+    .auth-container {
+        max-width: 400px;
+        margin: 50px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .auth-header h1 {
+        color: #667eea;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+
+    .auth-header p {
+        color: #999;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .auth-footer a {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .password-requirements {
+        background: #f0f0f0;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .requirement {
+        margin: 5px 0;
+    }
+
+    .requirement.met {
+        color: #28a745;
+    }
+
+    .requirement.met::before {
+        content: "✓ ";
+        font-weight: 600;
+    }
+
+    .requirement:not(.met)::before {
+        content: "○ ";
+    }
+</style>
+
+<div class="auth-container">
+    <div class="auth-header">
+        <h1>💊</h1>
+        <h2>Create Account</h2>
+        <p>Join Medication Reminder today</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" novalidate id="registerForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                placeholder="Choose a username"
+                pattern="[a-zA-Z0-9_]{3,}"
+                required
+                autofocus
+            >
+            <div class="form-error" id="usernameError"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="your.email@example.com"
+                required
+            >
+            <div class="form-error" id="emailError"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="Create a strong password"
+                minlength="6"
+                required
+            >
+            <div id="passwordRequirements" class="password-requirements" style="display: none;">
+                <div class="requirement" id="req-length">At least 6 characters</div>
+                <div class="requirement" id="req-upper">One uppercase letter</div>
+                <div class="requirement" id="req-lower">One lowercase letter</div>
+                <div class="requirement" id="req-number">One number</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input 
+                type="password" 
+                id="confirm_password" 
+                name="confirm_password" 
+                placeholder="Confirm your password"
+                required
+            >
+            <div class="form-error" id="confirmError"></div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+        Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Show password requirements
+    passwordInput.addEventListener('focus', function() {
+        document.getElementById('passwordRequirements').style.display = 'block';
+    });
+
+    // Check password requirements
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        document.getElementById('req-length').classList.toggle('met', password.length >= 6);
+        document.getElementById('req-upper').classList.toggle('met', /[A-Z]/.test(password));
+        document.getElementById('req-lower').classList.toggle('met', /[a-z]/.test(password));
+        document.getElementById('req-number').classList.toggle('met', /[0-9]/.test(password));
+    });
+
+    // Validate form on submit
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const usernameError = document.getElementById('usernameError');
+        const emailError = document.getElementById('emailError');
+        const confirmError = document.getElementById('confirmError');
+
+        usernameError.textContent = '';
+        emailError.textContent = '';
+        confirmError.textContent = '';
+
+        // Validate username
+        const username = document.getElementById('username').value;
+        if (username.length < 3) {
+            usernameError.textContent = 'Username must be at least 3 characters';
+            isValid = false;
+        }
+
+        // Validate email
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            emailError.textContent = 'Please enter a valid email';
+            isValid = false;
+        }
+
+        // Validate password confirmation
+        const password = passwordInput.value;
+        if (password !== confirmInput.value) {
+            confirmError.textContent = 'Passwords do not match';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

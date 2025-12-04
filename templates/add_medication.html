@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Add Medication{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="form-container">
+    <h2>Add New Medication</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Medication Name *</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Aspirin, Vitamin D" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dosage">Dosage *</label>
+            <input type="text" id="dosage" name="dosage" placeholder="e.g., 500mg, 2 tablets" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Any notes about this medication..." rows="4"></textarea>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 12px;">Add Medication</button>
+    </form>
+</div>
+{% endblock %}
